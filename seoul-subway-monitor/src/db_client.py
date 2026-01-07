@@ -32,12 +32,12 @@ class SubwayDB:
                 "station_id": item.get("statnId"),
                 "station_name": item.get("statnNm"),
                 "train_number": item.get("trainNo"),
-                "last_rec_date": item.get("lastRecptnDt"),
-                "last_rec_time": item.get("recptnDt"),
+                "last_received_date": item.get("lastRecptnDt"),
+                "last_received_time": item.get("recptnDt"),
                 "direction_type": item.get("updnLine"),
-                "dest_station_id": item.get("statnTid"),
-                "dest_station_name": item.get("statnTnm"),
-                "train_status": item.get("trainSttus"),
+                "destination_station_id": item.get("statnTid"),
+                "destination_station_name": item.get("statnTnm"),
+                "train_status_code": item.get("trainSttus"),
                 "is_express": item.get("directAt"),
                 "is_last_train": item.get("lstcarAt") == "1", # Boolean 변환
                 # created_at은 DB Default 값 사용 (now())
@@ -52,3 +52,19 @@ class SubwayDB:
         except Exception as e:
             print(f"[DB Error] Failed to insert data: {e}")
             return False
+
+    def fetch_train_data(self, line_id: str, limit: int = 1000):
+        """
+        분석을 위해 특정 호선의 최근 데이터를 가져옵니다.
+        """
+        try:
+            response = self.supabase.table(self.table_name)\
+                .select("*")\
+                .eq("line_id", line_id)\
+                .order("created_at", desc=True)\
+                .limit(limit)\
+                .execute()
+            return response.data
+        except Exception as e:
+            print(f"[DB Error] Failed to fetch data: {e}")
+            return []

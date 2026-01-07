@@ -33,12 +33,14 @@ class SeoulMetroAPI:
             
             data = response.json()
             
-            # API 응답 상태 확인 ('realtimePosition' 키가 없거나 'ErrorMessage'가 있는 경우)
-            if 'realtimePosition' not in data:
-                print(f"[API Warning] No data found for {line_name}. Response: {data.get('RESULT', {}).get('message', 'Unknown Error')}")
+            # API 응답 상태 확인 ('realtimePosition' 또는 'realtimePositionList' 확인)
+            if 'realtimePosition' in data:
+                return data['realtimePosition']
+            elif 'realtimePositionList' in data:
+                return data['realtimePositionList']
+            else:
+                print(f"[API Warning] No data found for {line_name}. Type: {type(data)}, Response: {data}")
                 return []
-
-            return data['realtimePosition']
 
         except requests.exceptions.RequestException as e:
             print(f"[API Error] Failed to fetch data for {line_name}: {e}")
